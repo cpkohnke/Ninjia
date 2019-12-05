@@ -1,0 +1,76 @@
+import arcade
+Width = 900
+Height = 700
+Name = "Pac Man"
+W = 50
+H = 50
+movementM = 5
+restZone = 0.05
+class PacMan(arcade.Window):
+    def __init__(self, width, height, title):
+        super().__init__(width, height, title)
+        self.player = None
+        self.left_down = False
+        JS = arcade.getJoysticks
+        if JS:
+            self.JS = JS[0]
+            self.JS.open()
+            self.JS.onStickPress = self.onStickPress
+            self.JS.onStickRelease = self.onStickRelease
+            self.JS.onJoyMotion = self.onJoyMotion
+        else:
+            print("none")
+            self.JS = None
+    def onStickPress(self, _JS, button):
+        print("Button {} down".format(button))
+    def onStickRelease(self, _JS, button):
+        print("Button {} up".format(button))
+    def onJoyMotion(self, _JS, x, y):
+        print("Hat ({}, {})".format(x, y))
+    def begining(self):
+        width = W
+        height = H
+        x = Width // 2
+        y = Height // 2
+        angle = 0
+        color = arcade.color.WHITE
+        self.player = Rectangle(x, y, width, height, angle, color)
+        self.left_down = False
+    def onUpdate(self, dt):
+        if self.JS:
+            self.player.delta_x = self.JS.x * movementM
+            if abs(self.player.deltaX) < restZone:
+                self.player.deltaX = 0
+            self.player.deltaY = -self.JS.y * movementM
+            if abs(self.player.deltaY) < restZone:
+                self.player.delta_y = 0
+        self.player.move()
+    def onDraw(self):
+        arcade.startRender()
+class Moves:
+    def __init__(self, x, y, width, height, angle):
+        self.x = x
+        self.y = y
+        self.deltaX = 0
+        self.deltaY = 0
+        self.width = width
+        self.height = height
+        self.angle = angle
+    def Movement(self):
+        self.x += self.deltaX
+        if self.x < W // 2:
+            self.x = W // 2
+        if self.x > Width - (W // 2):
+            self.x = Width - (W // 2)
+        self.y += self.deltaY
+        if self.y < H // 2:
+            self.y = H // 2
+        if self.y > Height - (H // 2):
+            self.y = Height - (H // 2)
+def main():
+    program = PacMan(Width, Height, Name)
+    program.setup()
+    arcade.run()
+
+if __name__ == "__main__":
+    main()
